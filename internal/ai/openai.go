@@ -15,7 +15,7 @@ func GenerateCommitMessage(diff string) (string, error) {
 	}
 	client := openai.NewClient(apikey)
 
-	prompt := fmt.Sprintf("Generate a professional and concise Git commit message for the following diff:\n\n%s\n\n➡️ Use conventional commit prefixes (e.g., feat, fix, chore) and relevant emojis (e.g., 🐛 for fixes, ✨ for features). Keep it brief and consistent.", diff)
+	prompt := fmt.Sprintf("Generate a professional and concise Git commit message for the following diff:\n\n%s\n\n➡️ Use conventional commit prefixes (e.g., feat, fix, chore) and relevant emojis (e.g., 🐛 for fixes, ✨ for features). Keep it brief and consistent. Do not include quotation marks.", diff)
 
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
