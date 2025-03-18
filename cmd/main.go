@@ -61,9 +61,6 @@ func Execute() error {
 		},
 	}
 
-	// This is the main issue - you're passing "gitto" as an argument which isn't needed
-	// When running "go run main.go commit", the os.Args will be ["main.go", "commit"]
-	// So we should use os.Args directly
 	return cmd.Run(context.Background(), os.Args)
 }
 
