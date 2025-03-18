@@ -4,18 +4,19 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/Hemsara/gitto/config"
+	// "github.com/Hemsara/gitto/config"
 	"github.com/Hemsara/gitto/internal/ai"
+	"github.com/Hemsara/gitto/internal/keys"
 
 	"github.com/Hemsara/gitto/internal/git"
 	"github.com/urfave/cli/v3"
 )
 
 func main() {
-	config.LoadConfig()
 
 	if err := Execute(); err != nil {
 		log.Fatal(err)
@@ -24,12 +25,46 @@ func main() {
 
 func Execute() error {
 	cmd := &cli.Command{
-		Name:   "gitto",
-		Usage:  "Git commits on steroids",
-		Action: PerformCommit,
+		Name:  "gitto",
+		Usage: "Git commits on steroids",
+
+		Commands: []*cli.Command{
+			{
+				Name:  "config",
+				Usage: "Configure gitto",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "apikey",
+						Aliases: []string{"k"},
+						Usage:   "API key for authentication",
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					apiKey := cmd.String("apikey")
+					if apiKey == "" {
+						return fmt.Errorf("API key is required")
+					}
+
+					err := keys.SaveAPIKey(apiKey)
+					if err != nil {
+						return fmt.Errorf("failed to save API key: %v", err)
+					}
+
+					return nil
+				},
+			},
+			{
+				Name:   "commit",
+				Usage:  "Commit changes",
+				Action: PerformCommit,
+			},
+		},
 	}
 
-	return cmd.Run(context.Background(), []string{"gitto"})
+	// This is the main issue - you're passing "gitto" as an argument which isn't needed
+	// When running "go run main.go commit", the os.Args will be ["main.go", "commit"]
+	// So we should use os.Args directly
+	return cmd.Run(context.Background(), os.Args)
 }
 
 func PerformCommit(ctx context.Context, cmd *cli.Command) error {

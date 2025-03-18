@@ -4,12 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Hemsara/gitto/config"
+	"github.com/Hemsara/gitto/internal/keys"
 	"github.com/sashabaranov/go-openai"
 )
 
 func GenerateCommitMessage(diff string) (string, error) {
-	client := openai.NewClient(config.OpenAIAPIKey)
+	apikey, err := keys.LoadAPIKey()
+	if err != nil {
+		return "", err
+	}
+	client := openai.NewClient(apikey)
 
 	prompt := fmt.Sprintf("🔎 Generate a concise and meaningful git commit message (with emojis) for the following diff:\n\n%s\n\n➡️ Use relevant emojis for context (e.g., 🐛 for fixes, ✨ for features) and maintain a consistent style.", diff)
 
